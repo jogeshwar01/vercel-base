@@ -1,4 +1,8 @@
-import { UPLOAD_SERVICE_PORT, REDIS_FILES_QUEUE } from "./config";
+import {
+    UPLOAD_SERVICE_PORT,
+    REDIS_FILES_QUEUE,
+    REDIS_STATUS_OBJECT,
+} from "./config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import path from "path";
@@ -10,11 +14,14 @@ import { createClient } from "redis";
 const publisher = createClient();
 publisher.connect();
 
+const subscriber = createClient();
+subscriber.connect();
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post("/upload", async (req: Request, res: Response) => {
+app.post("/deploy", async (req: Request, res: Response) => {
     const id = generate();
 
     await simpleGit().clone(
@@ -28,10 +35,25 @@ app.post("/upload", async (req: Request, res: Response) => {
         await uploadFile(file.slice(__dirname.length + 1), file);
     });
 
+    await new Promise((resolve): any => setTimeout(resolve, 10000));
+
     publisher.lPush(REDIS_FILES_QUEUE ?? "build-queue", id);
+
+    publisher.hSet(REDIS_STATUS_OBJECT ?? "status", id, "uploaded");
 
     res.json({
         id: id,
+    });
+});
+
+app.get("/status", async (req, res) => {
+    const id = req.query.id;
+    const response = await subscriber.hGet(
+        REDIS_STATUS_OBJECT ?? "status",
+        id as string
+    );
+    res.json({
+        status: response,
     });
 });
 

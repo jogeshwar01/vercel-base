@@ -1,4 +1,4 @@
-import { REDIS_FILES_QUEUE } from "./config";
+import { REDIS_FILES_QUEUE, REDIS_STATUS_OBJECT } from "./config";
 import { copyFinalDist, downloadS3Folder } from "./aws";
 import { commandOptions, createClient } from "redis";
 import { buildProject } from "./utils";
@@ -22,7 +22,8 @@ async function main() {
             await downloadS3Folder(`output/${id}`);
             await buildProject(id);
             copyFinalDist(id);
-            publisher.hSet("status", id, "deployed");
+
+            publisher.hSet(REDIS_STATUS_OBJECT ?? "status", id, "deployed");
         }
     }
 }
