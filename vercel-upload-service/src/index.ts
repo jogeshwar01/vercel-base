@@ -1,17 +1,15 @@
+import { UPLOAD_SERVICE_PORT } from "./config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import path from "path";
 import { generate } from "./utils";
 import { getAllFiles } from "./file";
 import simpleGit from "simple-git";
-import dotenv from "dotenv";
-dotenv.config();
+import { uploadFile } from "./aws";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const port = process.env.UPLOAD_SERVICE_PORT;
 
 app.post("/upload", async (req: Request, res: Response) => {
     const id = generate();
@@ -22,13 +20,16 @@ app.post("/upload", async (req: Request, res: Response) => {
     );
 
     const files = getAllFiles(path.join(__dirname, `/output/${id}`));
-    console.log(files);
+
+    files.forEach(async (file) => {
+        await uploadFile(file.slice(__dirname.length + 1), file);
+    });
 
     res.json({
         id: id,
     });
 });
 
-app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+app.listen(UPLOAD_SERVICE_PORT, () => {
+    console.log(`Listening on port ${UPLOAD_SERVICE_PORT}`);
 });
