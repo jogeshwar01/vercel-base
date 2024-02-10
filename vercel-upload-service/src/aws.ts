@@ -21,5 +21,5 @@ export const uploadFile = async (fileName: string, localFilePath: string) => {
         })
         .promise();
 
-    console.log(response);
+    console.log(`${fileName} uploaded to S3`);
 };
