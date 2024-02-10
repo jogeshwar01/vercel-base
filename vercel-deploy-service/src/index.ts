@@ -1,8 +1,12 @@
 import { REDIS_FILES_QUEUE } from "./config";
-import { downloadS3Folder } from "./aws";
+import { copyFinalDist, downloadS3Folder } from "./aws";
 import { commandOptions, createClient } from "redis";
+import { buildProject } from "./utils";
 const subscriber = createClient();
 subscriber.connect();
+
+const publisher = createClient();
+publisher.connect();
 
 async function main() {
     while (1) {
@@ -13,7 +17,13 @@ async function main() {
         );
 
         const id = res?.element;
-        await downloadS3Folder(`output/${id}`);
+
+        if (id) {
+            await downloadS3Folder(`output/${id}`);
+            await buildProject(id);
+            copyFinalDist(id);
+            publisher.hSet("status", id, "deployed");
+        }
     }
 }
 
