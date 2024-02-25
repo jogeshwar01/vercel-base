@@ -6,7 +6,12 @@ Remove in main app
 
 Note: Log in to docker desktop beforehand to prevent multiple docker clashes. If not logged in, see pt. 7.
 
-### Setting up AWS ECR and ECS -
+##### PORTS
+
+-   api-server - 9001
+-   s3-reverse-proxy - 900
+
+### Setting up AWS ECR and ECS - build-server
 
 1. Need `awscli version 2` - to allow ecr login in aws cli -
    aws installation First uninstall (using pip/pip3 uninstall) and then run the 3 commands given on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html. Reboot system if not showing up directly on aws --version
@@ -37,7 +42,7 @@ PROJECT_ID=
 GIT_REPOSITORY__URL=
 ```
 
-### AWS S3
+### AWS S3 - build-sever
 
 1. To allow s3 files download from anywhere, set public access policy in bucket permissions
 
@@ -62,3 +67,22 @@ GIT_REPOSITORY__URL=
 
 4. Example - If PROJECT_ID=p1 and proxy server at 9000
    Site accessible at `p1.localhost:9000`
+
+### API Setup for ECS/Fargate - api-server
+
+1. Set these env variables for ecs.  
+   We also need `Security Groups` and `Subnets` for `networkConfiguration`. Can get these in Networking tab when we do a `Run new task` from a ecs cluster.
+   For ecs image name, get it from `Task definitions` in `JSON` tab in ecs
+
+```
+AWS_SECRET_KEY=
+AWS_ACCESS_KEY=
+AWS_REGION_NAME=
+AWS_S3_BUCKET=
+AWS_ECS_CLUSTER_ARN=
+AWS_ECS_TASK_ARN=
+AWS_ECS_IMAGE_NAME=
+AWS_ECS_SUBNETS=
+AWS_ECS_SECURTIY_GROUPS=
+PROXY_PORT=(s3-reverse-proxy server port)
+```
