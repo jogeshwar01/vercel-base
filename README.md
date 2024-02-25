@@ -36,3 +36,29 @@ AWS_S3_BUCKET=
 PROJECT_ID=
 GIT_REPOSITORY__URL=
 ```
+
+### AWS S3
+
+1. To allow s3 files download from anywhere, set public access policy in bucket permissions
+
+2. First set `Block all public access` to false
+
+3. Add this policy in `Permissions/Bucket Policy`
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicRead",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::vercel-store/*"
+        }
+    ]
+}
+```
+
+4. Example - If PROJECT_ID=p1 and proxy server at 9000
+   Site accessible at `p1.localhost:9000`
