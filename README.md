@@ -9,7 +9,9 @@ Note: Log in to docker desktop beforehand to prevent multiple docker clashes. If
 ##### PORTS
 
 -   api-server - 9001
--   s3-reverse-proxy - 900
+-   s3-reverse-proxy - 9000
+-   socket log server - 9002
+-   redis - 6379
 
 ### Setting up AWS ECR and ECS - build-server
 
@@ -86,3 +88,16 @@ AWS_ECS_SUBNETS=
 AWS_ECS_SECURTIY_GROUPS=
 PROXY_PORT=(s3-reverse-proxy server port)
 ```
+
+2. To allow IAM user to run a task in ECS, need to give it a permission policy ie. `AmazonEC2ContainerServiceEventsRole`
+
+3. To allow complete access to ECR - `AmazonEC2ContainerRegistryFullAccess`
+
+### Redis
+
+1. Local installation (port 6379) - https://redis.io/docs/install/install-redis/install-redis-on-linux/
+
+2. Check installation -> `redis-cli`
+
+3. To make redis work, will need a public url as the logs will be published from inside our task/container in ECS. Can use https://aiven.io/redis for this. To use public url, update redis initialisation - 
+```const redis = new Redis('<url-here>')```
