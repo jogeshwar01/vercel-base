@@ -29,7 +29,7 @@ Note: Log in to docker desktop beforehand to prevent multiple docker clashes. If
 6. To delete aws configuration remove `~/.aws/credentials` along with `~/.aws/config`
 
 7. Run the 4 push commands given on `AWS ECR` (make sure to have docker desktop logged in for this).
-   Workaround - create docker-compose and build an image through it. Can skip 2nd step in ECR in that case.
+   Workaround - create docker-compose and build an image through it. Can skip 2nd step in ECR in that case. To build an image via docker-compose - run `docker compose -f docker-compose-build.yml build`. Do not use docker-compose up as we don't want to execute the ENTRYPOINT instruction.
 
 8. Go to `ECS`, create a cluster. To test, run a new task in cluster with desired image. Use `AWS Fargate` (serverless) option.
 
